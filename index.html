@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Smart Shopping List</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 1em; }
+    h2 { text-align: center; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 4px 0; border-bottom: 1px solid #ccc; }
+    input, button { padding: 0.5em; margin-top: 0.5em; width: 100%; }
+  </style>
+</head>
+<body>
+  <h2>Smart Shopping List</h2>
+  <ul id="items-list"></ul>
+  <input type="text" id="item-name" placeholder="Item name" />
+  <input type="number" id="item-qty" placeholder="Quantity" min="1" />
+  <button onclick="addItem()">Add Item</button>
+
+  <script>
+    const API_URL = 'http://localhost:5000/items'; // Update this later when deployed
+
+    function loadItems() {
+      fetch(API_URL)
+        .then(res => res.json())
+        .then(data => {
+          const list = document.getElementById('items-list');
+          list.innerHTML = '';
+          data.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = `${item.name} (${item.quantity || 1})`;
+            list.appendChild(li);
+          });
+        });
+    }
+
+    function addItem() {
+      const name = document.getElementById('item-name').value.trim();
+      const quantity = Number(document.getElementById('item-qty').value) || 1;
+      if (!name) return;
+
+      fetch(API_URL, {
+        method: 'POST,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, quantity })
+      })
+      .then(() => {
+        document.getElementById('item-name').value = '';
+        document.getElementById('item-qty').value = '';
+        loadItems();
+      });
+    }
+
+    loadItems();
+  </script>
+</body>
+</html>
